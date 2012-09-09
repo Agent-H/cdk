@@ -76,12 +76,14 @@ define([
 				var infos = getElementInfos(id);
 				
 				if(!infos.isRoot && infos.type != 'folder'){
-					_this.trigger('selected', {type: infos.type, model: _this.getTargetCollection(infos).getByCid(infos.id)});
+					_this.trigger('selected', infos.type, _this.getTargetCollection(infos).getByCid(infos.id));
 					_this.trigger('selected:'+infos.type, _this.getTargetCollection(infos).getByCid(infos.id));
 				}
 			});
 			
-			//Drag-n-drop behaviour
+			
+			/***	Drag-n-drop setup	***/
+			
 			this.tree.attachEvent("onBeforeDrag", function(sId){
 				return !getElementInfos(sId).isRoot;
 			});
@@ -106,22 +108,47 @@ define([
 				return _this.checkDrag.call(_this, dId,lId);
 			});
 			
-			this.tree.attachEvent("onEdit", function(state,id,tree,value){
 			
-				//Prevents editing of tree root elems
-				if(state == 0)
-					return !getElementInfos(id).isRoot;
-				
-				if(state == 2){
-					return _this.rename.call(_this, id, value);					
-				}
-				return true;
-			});
+			/***	Edit setup	***/
+			
+			this.tree.attachEvent("onEdit", (function(){
+				var correctVal = '';
+				var prevVal = '';
+				return function(state,id,tree,value){
+					//Prevents editing of tree root elems
+					if(state == 0){
+						prevVal = value;
+						return !getElementInfos(id).isRoot;
+					}
+					
+					if(state == 2){
+						if(value != prevVal){
+							//On applique une vérification
+							if(value.indexOf(' ') != -1){
+								correctVal = '';
+								return false;
+							}
+						
+						
+							if(getElementInfos(id).type == 'folder')
+								correctVal = _this.findFreeFolderName(_this.tree.getParentId(id), value);
+							else
+								correctVal = _this.findFreeElementName(_this.getTargetCollection(id), value);
+						}
+						else
+							correctVal = value;
+					}
+					
+					if(state == 3 && correctVal != ''){
+						return _this.rename.call(_this, id, correctVal);
+					}
+					return true;
+				};
+			})());
 			
 			//initialisation du contextMenu
 			this.initContextMenu();
 			
-			//TODO : ne pas refaire tout le rendu à chaque fois
 			this.model.get("entities").on("add remove", this.render, this);
 			this.model.get("components").on("add remove", this.render, this);
 			this.model.get("scenes").on("add remove", this.render, this);
@@ -132,6 +159,9 @@ define([
 			for(var i = 0 ; i < scenes.length ; i++){
 				scenes[i].get('entities').on("add remove", this.render, this);
 			}
+			
+			this.clipboard = {};
+			
 			this.render();
 		},
 		
@@ -203,7 +233,9 @@ define([
 			return path;
 		},
 		
-		findDirId: function(root, path, create){
+		
+		//Returns dir itemId based on path following the root 'root'
+		findDirId: function(root, path){
 			var dirs = _.compact(path.split('/'));
 			
 			var current = root;
@@ -245,6 +277,14 @@ define([
 				asset: 'assets'
 			};
 			
+			if(typeof(infos) == 'string'){
+				infos = getElementInfos(infos);
+			}
+			
+			if(infos.type == 'folder'){
+				infos = getElementInfos(this.getParentElementId(infos.itemID));
+			}
+			
 			return this.getTargetModel(infos).get(model2collec[infos.type]);
 		},
 		
@@ -272,12 +312,14 @@ define([
 				
 				var clone = elem.clone();
 				clone.set('path', this.getElementPath(tId));
+				clone.set('id', this.findFreeElementName(this.dropCollection, clone.id));
 				
 				var cid = elem.cid;
 				elem.destroy({silent: true});
 				clone.cid = cid;
 				
-				this.dropCollection.add(clone, {silent: true});			
+				this.dropCollection.add(clone, {silent: true});		
+				this.tree.setItemText(sId, clone.id);
 			}
 			else{				
 				this.forEachChild(sId, function(child){
@@ -323,19 +365,20 @@ define([
 			}
 		},
 		
-		add: function(id){	
+		add: function(id){
 			var infos = getElementInfos(id);
 			
 			var path = this.getElementPath(id);
 			
 			if(infos.type == 'folder'){
 				infos = getElementInfos(this.getParentElementId(id));
+				
+				var dirid = this.findDirId(infos.itemID, path);
+				
 				if(infos.type == 'scene' && !infos.isRoot){
 					infos.type = 'entity';
 					infos.itemID = id;
 				}
-				
-				var dirid = this.findDirId(infos.itemID, path);
 			}
 			else if(infos.isRoot){
 				var dirid = this.findDirId(infos.itemID, path);
@@ -354,43 +397,34 @@ define([
 			
 			if(infos.type == 'component'){
 				var newEl = new Component({path: path});
-				newId = 'c '+newEl.cid;
 				collec.add(newEl, {silent: true});
 			}
 			else if(infos.type == 'entity'){
 				var newEl = new Entity({path: path});
-				newId = 'e '+newEl.cid;
 				collec.add(newEl, {silent: true});
 			}
 			else if(infos.type == 'scene'){
 				var newEl = new Scene({path: path});
-				newId = 'sc '+newEl.cid;
 				newEl.get('entities').on('add remove', this.render, this);
 				collec.add(newEl, {silent: true});
 			}
 			else if(infos.type == 'sprite'){
 				var newEl = new Sprite({path: path});
-				newId = 'sp '+newEl.cid;
 				collec.add(newEl, {silent: true});
 			}
 			else if(infos.type == 'asset'){
 				var newEl = new Asset({path: path});
-				newId = 'a '+newEl.cid;
 				collec.add(newEl, {silent: true});
 			}
 			
-			if(infos.type == 'scene')
-				this.tree.insertNewChild(dirid, newId, '', '', iconsPath+'i_'+infos.type+'.png', iconsPath+'i_'+infos.type+'_o.png', iconsPath+'i_'+infos.type+'.png');
-			else
-				this.tree.insertNewChild(dirid, newId, '', '', iconsPath+'i_'+infos.type+'.png');
+			newEl.set('id', this.findFreeElementName(collec, "new "+infos.type));
+			var newId = this.insertChildElement(dirid, newEl, infos.type);
+			
 			this.tree.editItem(newId);
 		},
 		
 		rename: function(id, value){
-			//On applique une vérification
-			if(value.indexOf(' ') != -1)
-				return false;
-				
+		
 			var infos = getElementInfos(id);
 			
 			if(infos.type != 'folder'){
@@ -401,6 +435,8 @@ define([
 			else{
 				this.repath(id, this.getElementPath(id, true)+value+'/');
 			}
+			
+			this.tree.setItemText(id, value);
 				
 			return true;
 		},
@@ -419,19 +455,152 @@ define([
 			}, this);
 		},
 		
-		mkdir: function(target){
+		mkdir: function(target, name){
+			if(typeof(name) == 'undefined') name = "new_folder";
+			
+			name = this.findFreeFolderName(target, name);
+			
 			var id = 'f '+getUniqID();
 						
-			this.tree.insertNewChild(target, id, "new_folder",'','folderClosed.gif','','','',true);
+			this.tree.insertNewChild(target, id, name,'','folderClosed.gif','','','',true);
 			
 			return id;
+		},
+		
+		copy: function(src){
+			
+			function copyOne(clipboard, id){
+			
+				var infos = getElementInfos(id);
+			
+				if(infos.type != 'folder' && !infos.isRoot){
+					clipboard.elem = this.getTargetCollection(infos).getByCid(infos.id).clone();
+				}
+				else{
+					clipboard.elem = this.tree.getItemText(id);
+					clipboard.children = copyChildren.call(this, id);
+				}
+				
+			}
+			
+			function copyChildren(id){
+				var children = new Array();
+				
+				this.forEachChild(id, function(child){
+					var elem = {};
+					copyOne.call(this, elem, child);
+					children.push(elem);
+				}, this);
+				
+				return children;
+			}
+			
+			var type = getElementInfos(src).type;
+			if(type == 'folder'){
+				type = getElementInfos(this.getParentElementId(src)).type;
+				if(type == 'scene' && !type.isRoot)
+					type = 'entity';
+			}
+			this.clipboard = {
+				type: type
+			};
+			
+			copyOne.call(this, this.clipboard, src);
+			
+			this.contextMenu.setItemEnabled('paste');
+			
+		},
+		
+		paste: function(dst){
+			var dInfos = getElementInfos(dst);
+			
+			var type = this.clipboard.type;
+			
+			if(dInfos.type == 'scene' && type == 'entity'){
+				dInfos.type = 'entity';
+			}
+			else if(dInfos.type != 'folder' && !dInfos.isRoot){
+				dst = this.tree.getParentId(dst);
+				dInfos = getElementInfos(dst);
+			}
+			
+			var targetCollection = this.getTargetCollection(dInfos);
+			
+			function pasteOne(clip, item){
+				if(clip.children){
+					var dir = this.mkdir(item, this.findFreeFolderName(item, clip.elem));
+					
+					for(var i = 0 ; i < clip.children.length ; i++){
+						pasteOne.call(this, clip.children[i], dir);
+					}
+				}
+				else{
+					//Makes sure new id is unique
+					var elem = clip.elem.clone();
+					elem.set('id', this.findFreeElementName(targetCollection, elem.id));
+					elem.set('path', this.getElementPath(item));
+					
+					this.insertChildElement(item, elem, type);
+
+					targetCollection.add(elem, {silent: true});
+				}
+			}
+			
+			pasteOne.call(this, this.clipboard, dst);
+		},
+		
+		insertChildElement: function(root, elem, type){
+			
+			var id = _.keys(types)[_.values(types).indexOf(type)]+' '+elem.cid;
+			
+			if(type == 'scene')
+				this.tree.insertNewChild(root, id, elem.id, '', iconsPath+'i_'+type+'.png', iconsPath+'i_'+type+'_o.png', iconsPath+'i_'+type+'.png');
+			else
+				this.tree.insertNewChild(root, id, elem.id, '', iconsPath+'i_'+type+'.png');
+				
+				
+			return id;
+		},
+		
+		findFreeElementName: function(coll, name){
+			var list = _.map(coll.models, function(m){
+				return m.id;
+				});
+			
+			var name2 = name;
+			for(var i = 0 ; list.indexOf(name2) != -1 ; i++){
+				name2 = name+'_'+i;
+			}
+			
+			return name2;
+		},
+		
+		//Tries to find a free name in current branch based on name (eg. name_xxx)
+		findFreeFolderName: function(parentItem, name){
+			
+			var list = 	_.map(
+							_.filter(this.tree.getSubItems(parentItem).split(','),
+							function(i){
+								return getElementInfos(i).type == 'folder';
+							}, this)
+							
+						, function(i){
+							return this.tree.getItemText(i);
+						}, this);
+			
+			var name2 = name;
+			for(var i = 0 ; list.indexOf(name2) != -1 ; i++){
+				name2 = name+'_'+i;
+			}
+			
+			return name2;
 		},
 		
 		initContextMenu: function(){
 			
 			var _this = this;
 			
-			var menu = new dhtmlXMenuObject();
+			var menu = this.contextMenu = new dhtmlXMenuObject();
 				
 			var selectedId;
 			
@@ -450,9 +619,12 @@ define([
 						break;
 					case 'addChildEnt':
 						var ent = new Entity();
+						var coll = _this.model.get('scenes').getByCid(getElementInfos(selectedId).id).get('entities');
 						
-						_this.model.get('scenes').getByCid(getElementInfos(selectedId).id).get("entities").add(ent, {silent: true});
-						_this.tree.insertNewChild(selectedId, 'e '+ent.cid, '','',iconsPath+'i_entity.png');
+						ent.set('id', _this.findFreeElementName.call(_this, coll, "new entity"));
+						coll.add(ent, {silent: true});
+						
+						_this.tree.insertNewChild(selectedId, 'e '+ent.cid, ent.id,'',iconsPath+'i_entity.png');
 						_this.tree.editItem('e '+ent.cid);
 						break;
 					case 'rename':
@@ -467,6 +639,12 @@ define([
 					case 'refresh':
 						_this.render.call(_this);
 						break;
+					case 'copy':
+						_this.copy.call(_this, selectedId);
+						break;
+					case 'paste':
+						_this.paste.call(_this, selectedId);
+						break;
 				}
 			});
 
@@ -477,10 +655,10 @@ define([
 				}
 				
 				var infos = getElementInfos(id);
+				
 				if(infos.isRoot){
 					menu.hideItem('remove');
 					menu.hideItem('rename');
-					menu.hideItem('duplicate');
 					menu.hideItem('addChildEnt');
 					menu.showItem('mkdir');
 				}
@@ -489,13 +667,11 @@ define([
 					menu.showItem('rename');
 					menu.showItem('addChildEnt');
 					menu.showItem('mkdir');
-					menu.showItem('duplicate');
 				}
 				else if(infos.type == "folder"){
 					menu.showItem('remove');
 					menu.showItem('rename');
 					menu.showItem('mkdir');
-					menu.showItem('duplicate');
 					menu.hideItem('addChildEnt');
 					
 					infos = getElementInfos(_this.getParentElementId(id));
@@ -505,16 +681,27 @@ define([
 				else{
 					menu.showItem('remove');
 					menu.showItem('rename');
-					menu.showItem('duplicate');
 					menu.hideItem('addChildEnt');
 					menu.hideItem('mkdir');
 				}
+				
+				if(_this.checkPastePossible.call(_this, infos))
+					menu.setItemEnabled('paste');
+				else
+					menu.setItemDisabled('paste');
 				
 				menu.setItemText('new', 'New '+infos.type);
 				
 				selectedId = id;
 				menu.showContextMenu(object.clientX, object.clientY);
 			});
+		},
+		
+		checkPastePossible: function(infos){
+			if(infos.type == 'folder')
+				infos = getElementInfos(this.getParentElementId(infos.itemID));
+			
+			return (infos.type == this.clipboard.type) || (infos.type == 'scene' && this.clipboard.type == 'entity');
 		},
 		
 		renderItem: function(type, item){

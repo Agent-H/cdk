@@ -4,8 +4,12 @@
 	<item id="mkdir" text= "Create directory" />
 	<item id="separator" type="separator"/> 
 	<item id="new" text="New"/>
-	<item id="rename" text="Rename" />
-	<item id="remove" text="Delete" />
+	<item id="editMenu" text="Edit">
+		<item id="copy" text="Copy" />
+		<item id="paste" text="Paste" enabled="false" />
+		<item id="rename" text="Rename" />
+		<item id="remove" text="Delete" />
+	</item>
 	<item id="separator2" type="separator"/> 
 	<item id="refresh" text="Refresh" />	
 </menu>
