@@ -13,7 +13,11 @@ define([
 	Assets
 ){
 
-	return Backbone.Model.extend({	
+	return Backbone.Model.extend({
+		defaults: {
+			title: 'unnamed project'
+		},
+		
 		initialize: function(){
 			console.log("project model initializing");
 			
