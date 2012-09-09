@@ -1,6 +1,7 @@
 define([
-	"app/ui/project",
-	"app/ui/toolbar",
+	"app/ui/Project",
+	"app/ui/Toolbar",
+	"app/ui/MDIArea",
 	"jquery",
 	"dhtmlx"
 ],
@@ -8,7 +9,8 @@ define([
 function(
 	
 	ProjectView,
-	Toolbar
+	Toolbar,
+	MDIArea
 	
 	){
 	
@@ -44,6 +46,10 @@ function(
 			
 			UI.toolbar = new Toolbar({
 				el: layout.main.attachToolbar()
+			});
+			
+			UI.MDIArea = new MDIArea({
+				el: layout.mainCell
 			});
 			
 			
