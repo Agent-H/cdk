@@ -1,0 +1,12 @@
+	<?xml version="1.0"?>
+		<toolbar>
+			<item id="project_title" type="text" text="Project"/>
+			<item id="sep0" type="separator" />
+			<item id="new" type="button" text="New" />
+			<item id="open" type="button" text="Open" />
+			<item id="save" type="button" text="Save" />
+			<item id="sep1" type="separator" />
+			<item id="build" type="button" text="Build" />
+			<item id="test" type="button" text="Test" />
+			<item id="download" type="button" text="Download" />
+		</toolbar>

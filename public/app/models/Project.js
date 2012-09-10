@@ -15,20 +15,21 @@ define([
 
 	return Backbone.Model.extend({
 		defaults: {
-			title: 'unnamed project'
+			title: ''
 		},
 		
 		initialize: function(){
 			console.log("project model initializing");
 			
-			this.set("scenes", new Scenes());
-			this.set("entities", new Entities());
-			this.set("components", new Components());
-			this.set("sprites", new Sprites());
-			this.set("assets", new Assets());
+			this.url = "/store/";
 			
-			
-		}
+			this.set("scenes", new Scenes(this.get('scenes')));
+			this.set("entities", new Entities(this.get('entities')));
+			this.set("components", new Components(this.get('components')));
+			this.set("sprites", new Sprites(this.get('sprites')));
+			this.set("assets", new Assets(this.get('assets')));
+		},
+		
+		sync: Backbone.sync
 	});
-	
 });

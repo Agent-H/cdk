@@ -36,6 +36,9 @@ function(
 			layout.mainCell = layout.main.cells('b');
 			layout.mainCell.hideHeader();
 			
+			layout.settingsCell = layout.main.cells('c');
+			layout.settingsCell.setWidth('300');
+			
 			
 			/***	Views setup	***/
 			
@@ -45,7 +48,8 @@ function(
 			});
 			
 			UI.toolbar = new Toolbar({
-				el: layout.main.attachToolbar()
+				el: layout.main.attachToolbar(),
+				model: app.models.project
 			});
 			
 			UI.MDIArea = new MDIArea({
@@ -62,7 +66,9 @@ function(
 			
 			/***	Model events	***/
 			
-			app.models.project.on("change:title", updateProjectTitle);
+			app.models.project.on("change:title", function(d){
+				updateProjectTitle(d.get('title'));
+			});
 			
 			
 			/***	UI Initialisation	***/
@@ -71,8 +77,6 @@ function(
 		});
 		
 		function updateProjectTitle(title){
-			UI.layout.projectCell.setText("Project : "+title);
-			
 			document.title = title+" - Crafty Development Kit";
 		}
 	

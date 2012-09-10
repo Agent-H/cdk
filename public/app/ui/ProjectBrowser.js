@@ -9,7 +9,6 @@ function(
 		initialize: function(){
 			
 			var layout = this.el.attachLayout('1C');
-			this.el.showHeader();
 			
 			var viewCell = layout.cells('a');
 			viewCell.hideHeader();
@@ -46,13 +45,20 @@ function(
 							projectView.paste(tree.getSelectedItemId());
 						break;
 					case 'new_childEnt':
-						//TODO
+						projectView.addChildEntity(tree.getSelectedItemId());
+						break;
+					case 'refresh':
+						projectView.render();
 						break;
 					case 'new_dir':
 						tree.editItem(projectView.mkdir(tree.getSelectedItemId()));
 						break;
 					case 'new_component':
-						projectView.add('component');
+					case 'new_entity':
+					case 'new_scene':
+					case 'new_sprite':
+					case 'new_asset':
+						projectView.add(id.split('_')[1]);
 						break;
 				}
 			});

@@ -61,7 +61,7 @@ define([
 			/***	Drag-n-drop setup	***/
 			
 			this.el.attachEvent("onBeforeDrag", function(sId){
-				return !this.getElementInfos(sId).isRoot;
+				return !_this.getElementInfos(sId).isRoot;
 			});
 			
 			this.el.attachEvent("onDrag", function(sId,tId,id,sObject,tObject){
@@ -356,6 +356,9 @@ define([
 			if(!id) return;
 			var infos = this.getElementInfos(id);
 			
+			if(infos.isRoot)
+				return;
+				
 			if(infos.type != 'folder'){
 				this.getTargetCollection(infos)
 					.getByCid(infos.id)
@@ -556,6 +559,17 @@ define([
 			pasteOne.call(this, this.clipboard, dst);
 		},
 		
+		addChildEntity: function(sceneId){
+			var ent = new Entity();
+			var coll = this.model.get('scenes').getByCid(this.getElementInfos(sceneId).id).get('entities');
+			
+			ent.set('id', this.findFreeElementName.call(this, coll, "new entity"));
+			coll.add(ent, {silent: true});
+			
+			this.el.insertNewChild(sceneId, 'e '+ent.cid, ent.id,'',iconsPath+'i_entity.png');
+			this.el.editItem('e '+ent.cid);
+		},
+		
 		insertChildElement: function(root, elem, type){
 			
 			var id = _.keys(types)[_.values(types).indexOf(type)]+' '+elem.cid;
@@ -625,14 +639,7 @@ define([
 						_this.add.call(_this, selectedId);
 						break;
 					case 'addChildEnt':
-						var ent = new Entity();
-						var coll = _this.model.get('scenes').getByCid(_this.getElementInfos(selectedId).id).get('entities');
-						
-						ent.set('id', _this.findFreeElementName.call(_this, coll, "new entity"));
-						coll.add(ent, {silent: true});
-						
-						_this.el.insertNewChild(selectedId, 'e '+ent.cid, ent.id,'',iconsPath+'i_entity.png');
-						_this.el.editItem('e '+ent.cid);
+						_this.addChildEntity.call(_this, selectedId);
 						break;
 					case 'rename':
 						_this.el.editItem(selectedId);

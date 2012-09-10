@@ -1,25 +1,52 @@
-define(['backbone'], function(){
+define([
+	'app/ui/views/Settings',
+	'backbone'
+], function(
+	SettingsView
+){
 	return Backbone.View.extend({
 	
 		initialize: function(){
+			var _this = this;
+			
 			var tabbar = this.tabbar = this.el.attachTabbar();
 			tabbar.setImagePath("lib/dhtmlx/imgs/");
 			tabbar.enableTabCloseButton(true);
 			tabbar.setHrefMode("ajax-html");
 			
-			tabbar.addTab("helloPage", "Welcome to CDK");
-			tabbar.setContentHref("helloPage","./hellopage.html");
-			tabbar.setTabActive("helloPage");
+			tabbar.addTab("welcome_tab", "Welcome to CDK");
+			tabbar.setContentHref("welcome_tab","./welcome_tab.html");
+			tabbar.setTabActive("welcome_tab");
+			
+			//Keeps track of opened tabs
+			this.openedTabs = new Array();
+			
+			tabbar.attachEvent("onTabClose", function(id){
+				delete _this.openedTabs[id];
+				return true;
+			});
+			
 		},
 		
 		select: function(type, model){
 			console.log("Select : "+type);
 			switch(type){
 				case 'settings':
-					console.log(this.tabbar.getLabel("settings"));
+					if(this.openedTabs.indexOf('settings') == -1){
+						this.openTab('settings', 'Settings');
+						new SettingsView({el: this.tabbar.cells('settings')});
+					}
+					else
+						this.tabbar.setTabActive('settings');
 				break;
 			
 			}
+		},
+		
+		openTab: function(id, title){
+			this.tabbar.addTab(id, title);
+			this.tabbar.setTabActive(id);
+			this.openedTabs.push(id);
 		}
 	});
 });

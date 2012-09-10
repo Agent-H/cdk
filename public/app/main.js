@@ -5,17 +5,32 @@ require([
 ], 
 function(
 	UI,
-	Project
+	Project,
+	ProjectCollec
 ) {
-	
 	//Short-circuit default backbone.sync's behaviour
 	Backbone.sync = function(){};
 	
 	var app = window.app = {
 		models: {
-			project: new Project()
+			//Loading default project template
+			project: new Project({id: "templates/default"})
+		},
+		collections: {
+			projects: new ProjectCollec()
 		}
 	};
+	
+	app.collections.projects.add(app.models.project);
+	
+	app.models.project.fetch({
+		success: function(){
+			console.log("ok");
+		},
+		error: function(){
+			console.log("not ok");
+		}
+	});
 	
 	app.ui = new UI(app);
 	

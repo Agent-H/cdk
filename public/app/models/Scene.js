@@ -22,7 +22,7 @@ define([
 		}),
 		
 		initialize: function(){
-			this.set('entities', new Entities());
+			this.set('entities', new Entities(this.get('entities')));
 		}
 	});
 	
