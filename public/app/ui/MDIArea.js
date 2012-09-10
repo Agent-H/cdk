@@ -10,6 +10,16 @@ define(['backbone'], function(){
 			tabbar.addTab("helloPage", "Welcome to CDK");
 			tabbar.setContentHref("helloPage","./hellopage.html");
 			tabbar.setTabActive("helloPage");
+		},
+		
+		select: function(type, model){
+			console.log("Select : "+type);
+			switch(type){
+				case 'settings':
+					console.log(this.tabbar.getLabel("settings"));
+				break;
+			
+			}
 		}
 	});
 });

@@ -29,33 +29,6 @@ define([
 				f: 'folder'
 			};
 	
-	//Returns item's type and ID
-	function getElementInfos(itemID){
-		var ret = {
-			type: '',
-			shortType: '',
-			id: '',
-			isRoot: false,
-			itemID: itemID
-		};
-		
-		//L'item est une racine
-		if(_.values(types).indexOf(itemID) != -1){
-			ret.type = itemID;
-			ret.isRoot = true;
-		}
-		else if(typeof(itemID) == 'string'){
-			var info = itemID.split(' ');
-			if(info.length == 2){
-				ret.type = types[info[0]];
-				ret.shortType = info[0];
-				ret.id = info[1];
-			}
-		}
-
-		return ret;
-	}
-	
 	var getUniqID = (function(){
 		var id = 0;
 		return function(){return id++;};
@@ -66,29 +39,32 @@ define([
 		initialize: function(){		
 			var _this = this;
 			
-			this.tree = this.el.attachTree();
-			this.tree.setIconsPath('lib/dhtmlx/imgs/');
-			this.tree.enableItemEditor(true);
-			this.tree.enableDragAndDrop(true, false);
+			this.el.setIconsPath('lib/dhtmlx/imgs/');
+			this.el.enableItemEditor(true);
+			this.el.enableDragAndDrop(true, false);
 			
 			
-			this.tree.attachEvent("onSelect", function(id){
-				var infos = getElementInfos(id);
+			this.el.attachEvent("onSelect", function(id){
+				var infos = _this.getElementInfos(id);
 				
 				if(!infos.isRoot && infos.type != 'folder'){
 					_this.trigger('selected', infos.type, _this.getTargetCollection(infos).getByCid(infos.id));
 					_this.trigger('selected:'+infos.type, _this.getTargetCollection(infos).getByCid(infos.id));
+				}
+				else if(infos.type == 'settings'){
+					_this.trigger('selected', infos.type, _this.model);
+					_this.trigger('selected:'+infos.type, _this.model);
 				}
 			});
 			
 			
 			/***	Drag-n-drop setup	***/
 			
-			this.tree.attachEvent("onBeforeDrag", function(sId){
-				return !getElementInfos(sId).isRoot;
+			this.el.attachEvent("onBeforeDrag", function(sId){
+				return !this.getElementInfos(sId).isRoot;
 			});
 			
-			this.tree.attachEvent("onDrag", function(sId,tId,id,sObject,tObject){
+			this.el.attachEvent("onDrag", function(sId,tId,id,sObject,tObject){
 				if(!_this.checkDrag.call(_this, sId, tId)){
 					return false;
 				}
@@ -97,28 +73,28 @@ define([
 				return true;
 			});
 			
-			this.tree.attachEvent("onDrop", function(sId,tId,id,sObject,tObject){
+			this.el.attachEvent("onDrop", function(sId,tId,id,sObject,tObject){
 				/*if(!_this.checkDrag.call(_this, sId, tId)){
 					return false;
 				}*/
 				return _this.onDrop.call(_this, sId,tId);
 			});
 			
-			this.tree.attachEvent("onDragIn", function(dId,lId,sObject,tObject){
+			this.el.attachEvent("onDragIn", function(dId,lId,sObject,tObject){
 				return _this.checkDrag.call(_this, dId,lId);
 			});
 			
 			
 			/***	Edit setup	***/
 			
-			this.tree.attachEvent("onEdit", (function(){
+			this.el.attachEvent("onEdit", (function(){
 				var correctVal = '';
 				var prevVal = '';
 				return function(state,id,tree,value){
 					//Prevents editing of tree root elems
 					if(state == 0){
 						prevVal = value;
-						return !getElementInfos(id).isRoot;
+						return !_this.getElementInfos(id).isRoot;
 					}
 					
 					if(state == 2){
@@ -130,8 +106,8 @@ define([
 							}
 						
 						
-							if(getElementInfos(id).type == 'folder')
-								correctVal = _this.findFreeFolderName(_this.tree.getParentId(id), value);
+							if(_this.getElementInfos(id).type == 'folder')
+								correctVal = _this.findFreeFolderName(_this.el.getParentId(id), value);
 							else
 								correctVal = _this.findFreeElementName(_this.getTargetCollection(id), value);
 						}
@@ -165,13 +141,39 @@ define([
 			this.render();
 		},
 		
+		getElementInfos: function(itemID){
+			var ret = {
+				type: '',
+				shortType: '',
+				id: '',
+				isRoot: false,
+				itemID: itemID
+			};
+			
+			//L'item est une racine
+			if(_.values(types).indexOf(itemID) != -1){
+				ret.type = itemID;
+				ret.isRoot = true;
+			}
+			else if(typeof(itemID) == 'string'){
+				var info = itemID.split(' ');
+				if(info.length == 2){
+					ret.type = types[info[0]];
+					ret.shortType = info[0];
+					ret.id = info[1];
+				}
+			}
+
+			return ret;
+		},
+		
 		checkDrag: function(sId,tId){
-			var tInfos = getElementInfos(tId),
-				sInfos = getElementInfos(sId);
+			var tInfos = this.getElementInfos(tId),
+				sInfos = this.getElementInfos(sId);
 			
 			if(tInfos.isRoot){
 				if(sInfos.type == 'folder'){
-					pInfos = getElementInfos(this.getParentElementId(sId));
+					pInfos = this.getElementInfos(this.getParentElementId(sId));
 					return (pInfos.type == tInfos.type && !(pInfos.type == 'scene' && !pInfos.isRoot)) || (tInfos.type == 'entity' && pInfos.type == 'scene' && !pInfos.isRoot);
 				}
 				else
@@ -179,10 +181,10 @@ define([
 			}
 			
 			if(tInfos.type == 'folder'){
-				var pInfos = getElementInfos(this.getParentElementId(tId));
+				var pInfos = this.getElementInfos(this.getParentElementId(tId));
 				
 				if(sInfos.type == 'folder'){
-					psInfos = getElementInfos(this.getParentElementId(sId));
+					psInfos = this.getElementInfos(this.getParentElementId(sId));
 					return (pInfos.type == psInfos.type)
 						|| (psInfos.type == 'entity' && pInfos.type == 'scene' && !pInfos.isRoot)
 						|| (pInfos.type == 'entity' && psInfos.type == 'scene' && !psInfos.isRoot);
@@ -193,7 +195,7 @@ define([
 			
 			if(tInfos.type == 'scene'){
 				if(sInfos.type == 'folder'){
-					var pInfos = getElementInfos(this.getParentElementId(sId));
+					var pInfos = this.getElementInfos(this.getParentElementId(sId));
 					return pInfos.type == 'entity';
 				}
 				else
@@ -209,8 +211,8 @@ define([
 			};
 			
 			do{
-				infos = getElementInfos(this.tree.getParentId(infos.itemID));
-			} while((infos.type == '' || infos.type == 'folder') && this.tree.getLevel(infos.itemID) > 1);
+				infos = this.getElementInfos(this.el.getParentId(infos.itemID));
+			} while((infos.type == '' || infos.type == 'folder') && this.el.getLevel(infos.itemID) > 1);
 			
 			return infos.itemID;
 		},
@@ -219,16 +221,16 @@ define([
 			if(!skipDir) skipDir = false;	//true : skips item if item is a dir
 			
 			var path = '/';
-			var infos = getElementInfos(itemId);
+			var infos = this.getElementInfos(itemId);
 			
 			if(infos.type == 'folder' && !skipDir)
-				path = '/'+this.tree.getItemText(itemId)+path;
+				path = '/'+this.el.getItemText(itemId)+path;
 					
 			do{
-				infos = getElementInfos(this.tree.getParentId(infos.itemID));
+				infos = this.getElementInfos(this.el.getParentId(infos.itemID));
 				if(infos.type == 'folder')
-					path = '/'+this.tree.getItemText(infos.itemID)+path;
-			} while((infos.type == '' || infos.type == 'folder') && this.tree.getLevel(infos.itemID) > 1);
+					path = '/'+this.el.getItemText(infos.itemID)+path;
+			} while((infos.type == '' || infos.type == 'folder') && this.el.getLevel(infos.itemID) > 1);
 			
 			return path;
 		},
@@ -241,10 +243,10 @@ define([
 			var current = root;
 			
 			for(var i = 0 ; i < dirs.length ; i++){
-				var subitems = _.compact(this.tree.getSubItems(current).split(','));
+				var subitems = _.compact(this.el.getSubItems(current).split(','));
 				
 				var result = _.find(subitems, function(it){
-					return this.tree.getItemText(it) == dirs[i];
+					return this.el.getItemText(it) == dirs[i];
 				}, this);
 								
 				current = result;
@@ -256,7 +258,7 @@ define([
 		getTargetModel: function(infos){
 			
 			if(infos.type != 'scene'){
-				var pInfos = getElementInfos(this.getParentElementId(infos.itemID));
+				var pInfos = this.getElementInfos(this.getParentElementId(infos.itemID));
 				
 				if(pInfos.type == 'scene'){
 					if(pInfos.isRoot)
@@ -278,11 +280,11 @@ define([
 			};
 			
 			if(typeof(infos) == 'string'){
-				infos = getElementInfos(infos);
+				infos = this.getElementInfos(infos);
 			}
 			
 			if(infos.type == 'folder'){
-				infos = getElementInfos(this.getParentElementId(infos.itemID));
+				infos = this.getElementInfos(this.getParentElementId(infos.itemID));
 			}
 			
 			return this.getTargetModel(infos).get(model2collec[infos.type]);
@@ -290,7 +292,7 @@ define([
 		
 		//Applies function fn to each child of the specified elem(id)
 		forEachChild: function(id, fn, ctx){
-			var children = _.compact(this.tree.getSubItems(id).split(','));
+			var children = _.compact(this.el.getSubItems(id).split(','));
 			
 			for(var i = 0 ; i < children.length ; i++){
 				fn.call(ctx, children[i]);
@@ -298,7 +300,7 @@ define([
 		},
 		
 		onDrop: function(sId, tId){
-			var sInfos = getElementInfos(sId);
+			var sInfos = this.getElementInfos(sId);
 				
 			if(sInfos.type != 'folder'){
 				if(!this.dragCollection || !this.dropCollection){
@@ -306,7 +308,7 @@ define([
 					return;
 				}
 				
-				this.dropCollection = this.getTargetCollection(getElementInfos(sId));
+				this.dropCollection = this.getTargetCollection(this.getElementInfos(sId));
 				
 				var elem = this.dragCollection.getByCid(sInfos.id);
 				
@@ -319,7 +321,7 @@ define([
 				clone.cid = cid;
 				
 				this.dropCollection.add(clone, {silent: true});		
-				this.tree.setItemText(sId, clone.id);
+				this.el.setItemText(sId, clone.id);
 			}
 			else{				
 				this.forEachChild(sId, function(child){
@@ -332,8 +334,8 @@ define([
 		
 		//On cherche quelle collection va être prélevée
 		onDrag: function(sId, tId){
-			var tInfos = getElementInfos(tId),
-				sInfos = getElementInfos(sId);
+			var tInfos = this.getElementInfos(tId),
+				sInfos = this.getElementInfos(sId);
 				
 			if(sInfos.type != 'folder'){
 				this.dragCollection = this.getTargetCollection(sInfos);
@@ -351,27 +353,30 @@ define([
 		},
 		
 		remove: function(id){
-			var infos = getElementInfos(id);
+			if(!id) return;
+			var infos = this.getElementInfos(id);
 			
 			if(infos.type != 'folder'){
 				this.getTargetCollection(infos)
 					.getByCid(infos.id)
 						.destroy({silent: true});
-				this.tree.deleteItem(id);
+				this.el.deleteItem(id);
 			}
 			else{
 				this.forEachChild(id, this.remove, this);
-				this.tree.deleteItem(id);
+				this.el.deleteItem(id);
 			}
 		},
 		
 		add: function(id){
-			var infos = getElementInfos(id);
+			if(!id) return;
+			
+			var infos = this.getElementInfos(id);
 			
 			var path = this.getElementPath(id);
 			
 			if(infos.type == 'folder'){
-				infos = getElementInfos(this.getParentElementId(id));
+				infos = this.getElementInfos(this.getParentElementId(id));
 				
 				var dirid = this.findDirId(infos.itemID, path);
 				
@@ -420,12 +425,12 @@ define([
 			newEl.set('id', this.findFreeElementName(collec, "new "+infos.type));
 			var newId = this.insertChildElement(dirid, newEl, infos.type);
 			
-			this.tree.editItem(newId);
+			this.el.editItem(newId);
 		},
 		
 		rename: function(id, value){
 		
-			var infos = getElementInfos(id);
+			var infos = this.getElementInfos(id);
 			
 			if(infos.type != 'folder'){
 				this.getTargetCollection(infos)
@@ -436,14 +441,14 @@ define([
 				this.repath(id, this.getElementPath(id, true)+value+'/');
 			}
 			
-			this.tree.setItemText(id, value);
+			this.el.setItemText(id, value);
 				
 			return true;
 		},
 		
 		repath: function(id, path){
 			this.forEachChild(id, function(child){
-				infos = getElementInfos(child);
+				infos = this.getElementInfos(child);
 				if(infos.type != 'folder'){
 					
 					this.getTargetCollection(infos)
@@ -451,33 +456,35 @@ define([
 						.set('path', path);
 				}
 				else
-					this.repath(child, path+this.tree.getItemText(child)+'/');
+					this.repath(child, path+this.el.getItemText(child)+'/');
 			}, this);
 		},
 		
 		mkdir: function(target, name){
+			if(!target) return;
 			if(typeof(name) == 'undefined') name = "new_folder";
 			
 			name = this.findFreeFolderName(target, name);
 			
 			var id = 'f '+getUniqID();
 						
-			this.tree.insertNewChild(target, id, name,'','folderClosed.gif','','','',true);
+			this.el.insertNewChild(target, id, name,'','folderClosed.gif','','','',true);
 			
 			return id;
 		},
 		
 		copy: function(src){
+			if(!src) return;
 			
 			function copyOne(clipboard, id){
 			
-				var infos = getElementInfos(id);
+				var infos = this.getElementInfos(id);
 			
 				if(infos.type != 'folder' && !infos.isRoot){
 					clipboard.elem = this.getTargetCollection(infos).getByCid(infos.id).clone();
 				}
 				else{
-					clipboard.elem = this.tree.getItemText(id);
+					clipboard.elem = this.el.getItemText(id);
 					clipboard.children = copyChildren.call(this, id);
 				}
 				
@@ -495,9 +502,9 @@ define([
 				return children;
 			}
 			
-			var type = getElementInfos(src).type;
+			var type = this.getElementInfos(src).type;
 			if(type == 'folder'){
-				type = getElementInfos(this.getParentElementId(src)).type;
+				type = this.getElementInfos(this.getParentElementId(src)).type;
 				if(type == 'scene' && !type.isRoot)
 					type = 'entity';
 			}
@@ -512,7 +519,7 @@ define([
 		},
 		
 		paste: function(dst){
-			var dInfos = getElementInfos(dst);
+			var dInfos = this.getElementInfos(dst);
 			
 			var type = this.clipboard.type;
 			
@@ -520,8 +527,8 @@ define([
 				dInfos.type = 'entity';
 			}
 			else if(dInfos.type != 'folder' && !dInfos.isRoot){
-				dst = this.tree.getParentId(dst);
-				dInfos = getElementInfos(dst);
+				dst = this.el.getParentId(dst);
+				dInfos = this.getElementInfos(dst);
 			}
 			
 			var targetCollection = this.getTargetCollection(dInfos);
@@ -554,9 +561,9 @@ define([
 			var id = _.keys(types)[_.values(types).indexOf(type)]+' '+elem.cid;
 			
 			if(type == 'scene')
-				this.tree.insertNewChild(root, id, elem.id, '', iconsPath+'i_'+type+'.png', iconsPath+'i_'+type+'_o.png', iconsPath+'i_'+type+'.png');
+				this.el.insertNewChild(root, id, elem.id, '', iconsPath+'i_'+type+'.png', iconsPath+'i_'+type+'_o.png', iconsPath+'i_'+type+'.png');
 			else
-				this.tree.insertNewChild(root, id, elem.id, '', iconsPath+'i_'+type+'.png');
+				this.el.insertNewChild(root, id, elem.id, '', iconsPath+'i_'+type+'.png');
 				
 				
 			return id;
@@ -579,13 +586,13 @@ define([
 		findFreeFolderName: function(parentItem, name){
 			
 			var list = 	_.map(
-							_.filter(this.tree.getSubItems(parentItem).split(','),
+							_.filter(this.el.getSubItems(parentItem).split(','),
 							function(i){
-								return getElementInfos(i).type == 'folder';
+								return this.getElementInfos(i).type == 'folder';
 							}, this)
 							
 						, function(i){
-							return this.tree.getItemText(i);
+							return this.el.getItemText(i);
 						}, this);
 			
 			var name2 = name;
@@ -611,7 +618,7 @@ define([
 			menu.attachEvent("onClick", function(id, zoneid){
 				
 				//manipulating children while editing is a source of bugs
-				_this.tree.stopEdit();
+				_this.el.stopEdit();
 				
 				switch(id){
 					case 'new':
@@ -619,22 +626,22 @@ define([
 						break;
 					case 'addChildEnt':
 						var ent = new Entity();
-						var coll = _this.model.get('scenes').getByCid(getElementInfos(selectedId).id).get('entities');
+						var coll = _this.model.get('scenes').getByCid(_this.getElementInfos(selectedId).id).get('entities');
 						
 						ent.set('id', _this.findFreeElementName.call(_this, coll, "new entity"));
 						coll.add(ent, {silent: true});
 						
-						_this.tree.insertNewChild(selectedId, 'e '+ent.cid, ent.id,'',iconsPath+'i_entity.png');
-						_this.tree.editItem('e '+ent.cid);
+						_this.el.insertNewChild(selectedId, 'e '+ent.cid, ent.id,'',iconsPath+'i_entity.png');
+						_this.el.editItem('e '+ent.cid);
 						break;
 					case 'rename':
-						_this.tree.editItem(selectedId);
+						_this.el.editItem(selectedId);
 						break;
 					case 'remove':
 						_this.remove.call(_this, selectedId);
 						break;
 					case 'mkdir':
-						_this.tree.editItem(_this.mkdir.call(_this, selectedId));
+						_this.el.editItem(_this.mkdir.call(_this, selectedId));
 						break;
 					case 'refresh':
 						_this.render.call(_this);
@@ -648,13 +655,13 @@ define([
 				}
 			});
 
-			this.tree.attachEvent("onRightClick", function(id, object){
+			this.el.attachEvent("onRightClick", function(id, object){
 				if(id == 'settings'){
 					menu.hideContextMenu();
 					return;
 				}
 				
-				var infos = getElementInfos(id);
+				var infos = _this.getElementInfos(id);
 				
 				if(infos.isRoot){
 					menu.hideItem('remove');
@@ -674,7 +681,7 @@ define([
 					menu.showItem('mkdir');
 					menu.hideItem('addChildEnt');
 					
-					infos = getElementInfos(_this.getParentElementId(id));
+					infos = _this.getElementInfos(_this.getParentElementId(id));
 					if(infos.type == 'scene' && !infos.isRoot)
 						infos.type = 'entity';
 				}
@@ -698,10 +705,12 @@ define([
 		},
 		
 		checkPastePossible: function(infos){
+			if(!infos) return;
+			if(typeof(infos) == 'string')	infos = this.getElementInfos(infos);
 			if(infos.type == 'folder')
-				infos = getElementInfos(this.getParentElementId(infos.itemID));
+				infos = this.getElementInfos(this.getParentElementId(infos.itemID));
 			
-			return (infos.type == this.clipboard.type) || (infos.type == 'scene' && this.clipboard.type == 'entity');
+			return (infos.type == this.clipboard.type) || (infos.type == 'scene' && this.clipboard.type == 'entity' && !infos.isRoot);
 		},
 		
 		renderItem: function(type, item){
@@ -772,10 +781,10 @@ define([
 			);
 			
 			//Cleans the tree
-			this.tree.deleteChildItems(0);
+			this.el.deleteChildItems(0);
 			
 			//Then reloads contents
-			this.tree.loadJSONObject(tree);
+			this.el.loadJSONObject(tree);
 		}
 	});
 	

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+	<toolbar>
+		<item id="separator" type="separator"/> 
+		<item id="new" type="buttonSelect" img="new.png" imgdis="new_dis.png" text="New">
+			<item id="new_entity" type="button" text="Entity" img="i_entity.png"></item>
+			<item id="new_component" type="button" text="Component" img="i_component.png"></item>
+			<item id="new_scene" type="button" text="Scene" img="i_scene.png"></item>
+			<item id="new_sprite" type="button" text="Sprite" img="i_sprite.png"></item>
+			<item id="new_asset" type="button" text="Asset" img="i_asset.png"></item>
+			<item id="new_sep" type="separator"></item>
+			<item id="new_dir" type="button" text= "Directory" img="../lib/dhtmlx/imgs/folderClosed.gif"/>
+			<item id="new_childEnt" type="button" text="Child entity" img="childent.png" imgdis="childent_dis.png"></item>
+		</item>
+		<item id="copy" type="button" img="copy.png" />
+		<item id="paste" type="button" img="paste.png" imgdis="paste_dis.png" enabled="false" />
+		<item id="rename" type="button" img="rename.png" />
+		<item id="remove" type="button" img="delete.png" />
+		<item id="separator2" type="separator"/> 
+		<item id="refresh" type="button" img="refresh.png" />	
+	</toolbar>

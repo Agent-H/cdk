@@ -1,5 +1,5 @@
 define([
-	"app/ui/Project",
+	"app/ui/ProjectBrowser",
 	"app/ui/Toolbar",
 	"app/ui/MDIArea",
 	"jquery",
@@ -8,7 +8,7 @@ define([
 
 function(
 	
-	ProjectView,
+	ProjectBrowser,
 	Toolbar,
 	MDIArea
 	
@@ -34,12 +34,12 @@ function(
 			layout.projectCell.setWidth('250');
 			
 			layout.mainCell = layout.main.cells('b');
-			layout.mainCell.hideHeader();	
+			layout.mainCell.hideHeader();
 			
 			
 			/***	Views setup	***/
 			
-			UI.views.project = new ProjectView({
+			UI.projectBrowser = new ProjectBrowser({
 				model: app.models.project,
 				el: layout.projectCell
 			});
@@ -55,10 +55,8 @@ function(
 			
 			/***	UI events	***/
 			
-			UI.views.project.on('selected', function(type, model){
-				
-				console.log("selected : "+type);
-				console.log(model);
+			UI.projectBrowser.projectView.on('selected', function(type, model){
+				UI.MDIArea.select(type, model);
 			}, this);
 			
 			
