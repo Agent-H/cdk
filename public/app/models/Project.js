@@ -30,6 +30,28 @@ define([
 			this.set("assets", new Assets(this.get('assets')));
 		},
 		
-		sync: Backbone.sync
+		//Proxying Backbone.sync function
+		sync: (function(){
+			var sync = Backbone.sync;
+			return function(a,b,c){
+				var url = this.url;
+				this.url = url+this.id;
+				
+				sync.call(this, a, b, c);
+				
+				this.url = url;
+			};
+		})(),
+		
+		parse: function(response){
+			return {
+				title: response.title,
+				entities: new Entities(response.entities),
+				scenes: new Scenes(response.scenes),
+				components: new Components(response.components),
+				sprites: new Sprites(response.sprites),
+				assets: new Assets(response.assets)
+			};
+		}
 	});
 });

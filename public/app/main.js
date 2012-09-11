@@ -15,14 +15,9 @@ function(
 		models: {
 			//Loading default project template
 			project: new Project({id: "templates/default"})
-		},
-		collections: {
-			projects: new ProjectCollec()
 		}
 	};
-	
-	app.collections.projects.add(app.models.project);
-	
+		
 	app.models.project.fetch({
 		success: function(){
 			console.log("ok");
