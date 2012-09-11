@@ -10,12 +10,19 @@ app.use(app.router);
 app.use(express.static(__dirname+'/../public'));
 
 app.get('/welcome_tab.html', function(req, res){
-	res.render('welcome_tab', {
-		layout: false
+	store.getAll(function(err, data){
+		if(!err){
+			res.render('welcome_tab', {
+				layout: false,
+				projects: data.projects,
+				templates: data.templates,
+				examples: data.examples
+			});
+		}
 	});
 });
 
-app.get('/store/:dir/:name', store);
+app.get('/store/:dir/:name', store.route);
 
 app.listen(5000);
 

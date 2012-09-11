@@ -4,6 +4,51 @@ html
 		link(rel="stylesheet", href="css/bootstrap.min.css", type="text/css")
 	body
 		.container-fluid
-			h1 Welcome to CDK !
-			p.well this page is supposed to explain you how to get started !
-			|	From here, you should also be able to pick up one of your projects, a template project or an example
+			.page-header
+				h1 Welcome to CDK !
+			.row-fluid
+				p Start creating a complete browser-embedded game right now ! You can browse the examples to see how it works or select a template to begin.
+			.row-fluid
+				.span3
+					ul.nav.nav-list
+						li.welcome_tab_projects.active
+							a(href="#", data-nav="projects").welcome_nav_button
+								i.icon-chevron-right.pull-right
+								| Projets
+						li.welcome_tab_templates
+							a(href="#", data-nav="templates").welcome_nav_button
+								i.icon-chevron-right.pull-right
+								| Templates
+						li.welcome_tab_examples
+							a(href="#", data-nav="examples").welcome_nav_button
+								i.icon-chevron-right.pull-right
+								| Examples
+				.span9.well.welcome_browser
+					#welcome_projects
+						h3 Projects
+						ul.nav
+							- for (var i = 0; i < projects.length; ++i) {
+								li
+									a.welcome_pro_button(href="#", data-pro="projects/#{projects[i]}")
+										h4= projects[i]
+							- }
+					#welcome_templates(style="display: none;")
+						h3 Templates
+						ul.nav
+							- for (var i = 0; i < templates.length; ++i) {
+								li
+									a.welcome_pro_button(href="#", data-pro="templates/#{templates[i]}")
+										h4= templates[i]
+							- }
+					#welcome_examples(style="display: none;")
+						h3 Examples
+						ul.nav
+							- for (var i = 0; i < examples.length; ++i) {
+								li
+									a.welcome_pro_button(href="#", data-pro="examples/#{examples[i]}")
+										h4= examples[i]
+							- }
+			script(type="text/javascript")
+				$(function(){
+					$.getScript('welcome_tab.js');
+				});

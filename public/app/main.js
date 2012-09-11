@@ -14,18 +14,9 @@ function(
 	var app = window.app = {
 		models: {
 			//Loading default project template
-			project: new Project({id: "templates/default"})
+			project: new Project()
 		}
 	};
-		
-	app.models.project.fetch({
-		success: function(){
-			console.log("ok");
-		},
-		error: function(){
-			console.log("not ok");
-		}
-	});
 	
 	app.ui = new UI(app);
 	

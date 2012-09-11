@@ -256,17 +256,11 @@ define([
 		},
 		
 		getTargetModel: function(infos){
-			
-			if(infos.type != 'scene'){
+			if(infos.type == 'folder' || infos.type == 'entity'){
 				var pInfos = this.getElementInfos(this.getParentElementId(infos.itemID));
-				
-				if(pInfos.type == 'scene'){
-					if(pInfos.isRoot)
-						pInfos.id = infos.id;
+				if(pInfos.type == 'scene' && !pInfos.isRoot)
 					return this.model.get('scenes').getByCid(pInfos.id);
-				}
-			}
-			
+			}			
 			return this.model;
 		},
 		
@@ -282,11 +276,7 @@ define([
 			if(typeof(infos) == 'string'){
 				infos = this.getElementInfos(infos);
 			}
-			
-			if(infos.type == 'folder'){
-				infos = this.getElementInfos(this.getParentElementId(infos.itemID));
-			}
-			
+
 			return this.getTargetModel(infos).get(model2collec[infos.type]);
 		},
 		
@@ -526,7 +516,12 @@ define([
 			
 			var type = this.clipboard.type;
 			
-			if(dInfos.type == 'scene' && type == 'entity'){
+			if(dInfos.type == 'folder' && type == 'entity'){
+				var pInfos = this.getElementInfos(this.getParentElementId(dst));
+				if(pInfos.type == 'scene')
+					dInfos.type = 'entity';
+			}
+			else if(dInfos.type == 'scene' && type == 'entity'){
 				dInfos.type = 'entity';
 			}
 			else if(dInfos.type != 'folder' && !dInfos.isRoot){
@@ -748,6 +743,7 @@ define([
 			coll.forEach(function(it){
 				var dirs = _.compact(it.get('path').split('/'));
 				
+				//Creates dirs nodes according to path
 				var node = nodes;
 				
 				for(var i = 0 ; i < dirs.length ; i++){
@@ -761,13 +757,15 @@ define([
 							im0: 'folderClosed.gif',
 							text: dirs[i],
 							child: true,
-							open: true,
+							open: (i < dirs.length -1),
 							item: new Array()
 						};
 						node.push(next);
 					}
 					node = next.item;
-				}				
+				}
+				
+				
  				node.push(this.renderItem(type, it));
 				
 			}, this);
