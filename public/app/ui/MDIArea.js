@@ -19,10 +19,10 @@ define([
 			tabbar.setTabActive("welcome_tab");
 			
 			//Keeps track of opened tabs
-			this.openedTabs = new Array();
+			this.openedTabs = new Array("welcome_tab");
 			
 			tabbar.attachEvent("onTabClose", function(id){
-				delete _this.openedTabs[id];
+				delete _this.openedTabs[_this.openedTabs.indexOf(id)];
 				return true;
 			});
 			
@@ -47,6 +47,10 @@ define([
 			this.tabbar.addTab(id, title);
 			this.tabbar.setTabActive(id);
 			this.openedTabs.push(id);
+		},
+		
+		closeWelcomeTab: function(){
+			this.tabbar.removeTab('welcome_tab', true);
 		}
 	});
 });

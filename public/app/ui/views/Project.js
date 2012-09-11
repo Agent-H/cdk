@@ -44,7 +44,7 @@ define([
 			this.el.enableDragAndDrop(true, false);
 			
 			
-			this.el.attachEvent("onSelect", function(id){
+			this.el.attachEvent("onClick", function(id){
 				var infos = _this.getElementInfos(id);
 				
 				if(!infos.isRoot && infos.type != 'folder'){

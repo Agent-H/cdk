@@ -11,18 +11,23 @@ $(function(){
 				nextEl.fadeIn(400);
 			});
 		};
-	})()
+	})();
+	
+	function openProject(pro){
+		app.models.project.set('id', pro);
+		app.models.project.fetch();
+		app.ui.MDIArea.closeWelcomeTab();
+	}
 	
 	$('.welcome_nav_button').click(function(){
 		selectTab($(this).attr('data-nav'));
 	});
 	
 	$('.welcome_pro_button').click(function(){
-		app.models.project.set('id', $(this).attr('data-pro'));
-		app.models.project.fetch();
+		openProject($(this).attr('data-pro'));
 	});
 	
-	if($('#welcome_projects > ul').is(':empty')){
+	if($('#welcome_projects > ul').length == 0){
 		selectTab('examples');
 	}
 });

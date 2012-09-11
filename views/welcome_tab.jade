@@ -26,12 +26,16 @@ html
 				.span9.well.welcome_browser
 					#welcome_projects
 						h3 Projects
+						- if(projects.length > 0){
 						ul.nav
 							- for (var i = 0; i < projects.length; ++i) {
 								li
 									a.welcome_pro_button(href="#", data-pro="projects/#{projects[i]}")
 										h4= projects[i]
 							- }
+						- } else {
+						p You have no projects
+						- }
 					#welcome_templates(style="display: none;")
 						h3 Templates
 						ul.nav
