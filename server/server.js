@@ -6,6 +6,7 @@ var express = require('express'),
 app.set('views', __dirname + '/../views');
 app.set('view engine', 'jade');
 
+app.use(express.bodyParser());
 app.use(app.router);
 app.use(express.static(__dirname+'/../public'));
 
@@ -24,8 +25,10 @@ app.get('/welcome_tab.html', function(req, res){
 	});
 });
 
-app.get('/store/:dir/:name', store.getProject);
+app.get('/store/:cat/:id', store.getProject);
 app.get('/store/', store.getIndex);
+app.get('/store/:cat', store.getCategory);
+app.put('/store/:cat/:id', store.saveProject);
 
 app.listen(5000);
 

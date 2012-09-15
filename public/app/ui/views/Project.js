@@ -301,10 +301,10 @@ define([
 				
 				var clone = elem.clone();
 				clone.set('path', this.getElementPath(tId));
-				clone.set('id', this.findFreeElementName(this.dropCollection, clone.id));
-				
 				var cid = elem.cid;
 				elem.destroy({silent: true});
+				
+				clone.set('id', this.findFreeElementName(this.dropCollection, clone.id));
 				clone.cid = cid;
 				
 				this.dropCollection.add(clone, {silent: true});		

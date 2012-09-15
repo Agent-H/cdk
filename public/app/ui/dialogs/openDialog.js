@@ -18,8 +18,8 @@ define([
 				
 				var buttonsCell = layout.cells('b');
 				buttonsCell.hideHeader();
-				buttonsCell.attachObject($('<div id="openFialog_form">').get()[0]);
-				var buttons = new dhtmlXForm("openFialog_form", Buttons(['Open', 'Cancel']));
+				buttonsCell.attachObject($('<div id="openDialog_form">').get()[0]);
+				var buttons = new dhtmlXForm("openDialog_form", Buttons(['Open', 'Cancel']));
 				
 				buttonsCell.setHeight(20);
 				buttonsCell.fixSize(false, true);
@@ -41,8 +41,8 @@ define([
 							open: true,
 							item: _.map(elem, function(el){
 								return {
-									id: id++,
-									text: el
+									id: key+'/'+el,
+									text: el.split('.')[1]
 								};
 							})
 						}
@@ -70,8 +70,7 @@ define([
 					var sel = tree.getSelectedItemId();
 					
 					if(tree.getLevel(sel) == 2){
-						var projectId = tree.getItemText(tree.getParentId(sel))+'/'+tree.getItemText(sel);
-						app.models.project.set('id', projectId);
+						app.models.project.set('id', sel);
 						app.models.project.fetch();
 						win.close();
 					}

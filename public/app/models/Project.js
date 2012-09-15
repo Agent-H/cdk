@@ -15,7 +15,8 @@ define([
 
 	return Backbone.Model.extend({
 		defaults: {
-			title: ''
+			title: 'untitled',
+			id: 'unsaved/0.untitled'
 		},
 		
 		initialize: function(){
@@ -28,10 +29,6 @@ define([
 			this.set("components", new Components(this.get('components')));
 			this.set("sprites", new Sprites(this.get('sprites')));
 			this.set("assets", new Assets(this.get('assets')));
-			
-			this.on('change:title', function(){
-				this.set('id', 'projects/'+this.get('title'));
-			});
 		},
 		
 		//Proxying Backbone.sync function
@@ -48,14 +45,24 @@ define([
 		})(),
 		
 		parse: function(response){
-			return {
-				title: response.title,
-				entities: new Entities(response.entities),
-				scenes: new Scenes(response.scenes),
-				components: new Components(response.components),
-				sprites: new Sprites(response.sprites),
-				assets: new Assets(response.assets)
-			};
+			var obj = {};
+			
+			//In case of saving
+			if(typeof(response.id) != 'undefined')
+				obj.id = response.id;
+			//In case of loading
+			else if(response.title){
+				obj.title = response.title,
+				obj.entities = new Entities(response.entities),
+				obj.scenes = new Scenes(response.scenes),
+				obj.components = new Components(response.components),
+				obj.sprites = new Sprites(response.sprites),
+				obj.assets = new Assets(response.assets)
+			}
+			else
+				return;
+			
+			return obj;
 		}
 	});
 });

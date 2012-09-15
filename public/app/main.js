@@ -23,14 +23,14 @@ function(
 	app.save = function(project){
 		//User can only save projects
 		if(project.id.split('/')[0] != "projects"){
-			console.log('not a project');
+			app.ui.dialogs.save(project);
 		}
 		else
 			project.save();
 	};
 	
 	app.open = function(){
-		this.ui.dialogs.open();
+		app.ui.dialogs.open();
 	};
 	
 });
