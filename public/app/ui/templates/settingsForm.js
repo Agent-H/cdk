@@ -1,9 +1,7 @@
 define(function(){
+
 	return [
-			{type: "fieldset", name: "data", label: "Welcome", inputWidth: "auto", list:[
-				{type:"input", name: "name", label:"Login"},
-				{type:"password", name:"pass", label:"Password"},	
-				{type:"button", name:"save", value:"Proceed"}] 
-			}
-		];
+		{ type:"settings" , labelWidth:80, inputWidth:250, position:"absolute"  },
+		{ type:"input" , name:"title", label:"Project title", labelAlign:"left", inputWidth:170, labelLeft:50, labelTop:15, inputLeft:130, inputTop:15  }
+	];
 });

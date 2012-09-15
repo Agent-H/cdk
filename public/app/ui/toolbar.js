@@ -3,19 +3,25 @@ define(['backbone'], function(){
 	
 		initialize: function(){
 			var _this = this;
+			var app = this.model;
+			var project = this.project = app.models.project;
+
 			
 			this.el.loadXML('app/ui/templates/toolbar.xml', function(){
 				_this.updateTitle.call(_this);
-				_this.model.on("change:title", _this.updateTitle, _this);
+				project.on("change:title", _this.updateTitle, _this);
 			});
 			
 			this.el.attachEvent("onClick", function(id){
 				switch(id){
 					case 'save':
-						_this.model.save();
+						app.save(project);
 						break;
 					case 'load':
 						
+						break;
+					case 'open':
+						app.open();
 						break;
 				}
 			});
@@ -23,7 +29,7 @@ define(['backbone'], function(){
 		},
 		
 		updateTitle: function(){
-			this.el.setItemText('project_title', this.model.get('title'));
+			this.el.setItemText('project_title', this.project.get('title'));
 		}
 	});
 });

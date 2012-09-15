@@ -28,6 +28,10 @@ define([
 			this.set("components", new Components(this.get('components')));
 			this.set("sprites", new Sprites(this.get('sprites')));
 			this.set("assets", new Assets(this.get('assets')));
+			
+			this.on('change:title', function(){
+				this.set('id', 'projects/'+this.get('title'));
+			});
 		},
 		
 		//Proxying Backbone.sync function

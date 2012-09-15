@@ -34,7 +34,10 @@ define([
 				case 'settings':
 					if(this.openedTabs.indexOf('settings') == -1){
 						this.openTab('settings', 'Settings');
-						new SettingsView({el: this.tabbar.cells('settings')});
+						new SettingsView({
+							el: this.tabbar.cells('settings'),
+							model: this.model
+						});
 					}
 					else
 						this.tabbar.setTabActive('settings');

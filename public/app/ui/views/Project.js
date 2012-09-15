@@ -74,9 +74,6 @@ define([
 			});
 			
 			this.el.attachEvent("onDrop", function(sId,tId,id,sObject,tObject){
-				/*if(!_this.checkDrag.call(_this, sId, tId)){
-					return false;
-				}*/
 				return _this.onDrop.call(_this, sId,tId);
 			});
 			
@@ -573,8 +570,9 @@ define([
 				this.el.insertNewChild(root, id, elem.id, '', iconsPath+'i_'+type+'.png', iconsPath+'i_'+type+'_o.png', iconsPath+'i_'+type+'.png');
 			else
 				this.el.insertNewChild(root, id, elem.id, '', iconsPath+'i_'+type+'.png');
-				
-				
+			
+			console.log(id);
+			this.trigger('selected', type, this.getTargetCollection(id).getByCid(elem.cid));
 			return id;
 		},
 		

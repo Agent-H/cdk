@@ -20,4 +20,17 @@ function(
 	
 	app.ui = new UI(app);
 	
+	app.save = function(project){
+		//User can only save projects
+		if(project.id.split('/')[0] != "projects"){
+			console.log('not a project');
+		}
+		else
+			project.save();
+	};
+	
+	app.open = function(){
+		this.ui.dialogs.open();
+	};
+	
 });

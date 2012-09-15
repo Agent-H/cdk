@@ -2,6 +2,7 @@ define([
 	"app/ui/ProjectBrowser",
 	"app/ui/Toolbar",
 	"app/ui/MDIArea",
+	"app/ui/Dialogs",
 	"jquery",
 	"dhtmlx"
 ],
@@ -10,7 +11,8 @@ function(
 	
 	ProjectBrowser,
 	Toolbar,
-	MDIArea
+	MDIArea,
+	Dialogs
 	
 	){
 	
@@ -24,6 +26,12 @@ function(
 		dhtmlx.image_path='lib/dhtmlx/imgs/';
 		
 		$(function(){
+			
+			/***	Dialogs	***/
+			UI.dhxWins = new dhtmlXWindows();
+			
+			UI.dialogs = Dialogs(UI.dhxWins);
+			
 			
 			/***	Layout setup	***/
 			var layout = UI.layout = {
@@ -49,11 +57,12 @@ function(
 			
 			UI.toolbar = new Toolbar({
 				el: layout.main.attachToolbar(),
-				model: app.models.project
+				model: app
 			});
 			
 			UI.MDIArea = new MDIArea({
-				el: layout.mainCell
+				el: layout.mainCell,
+				model: app.models.project
 			});
 			
 			

@@ -22,7 +22,8 @@ app.get('/welcome_tab.html', function(req, res){
 	});
 });
 
-app.get('/store/:dir/:name', store.route);
+app.get('/store/:dir/:name', store.getProject);
+app.get('/store/', store.getIndex);
 
 app.listen(5000);
 

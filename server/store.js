@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-module.exports = {
+var exports = module.exports = {
 	getAll: function(cb){
 		
 		var collected = {
@@ -30,7 +30,20 @@ module.exports = {
 	
 	},
 	
-	route: function(req, res){
+	save: function(data, cb){
+		
+	},
+	
+	getProject: function(req, res){
 		res.sendfile(req.params.dir + '/' + req.params.name + '/'+req.params.name+'.json', {root: __dirname + '/../store/'});
+	},
+	
+	getIndex: function(req, res){
+		exports.getAll(function(err, list){
+			if(err)
+				res.end('error');
+			
+			res.end(JSON.stringify(list));
+		});
 	}
 };
