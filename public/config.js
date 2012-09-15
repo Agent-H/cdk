@@ -5,7 +5,8 @@ require.config({
 		"backbone": "lib/backbone-min",
 		"jquery": "lib/jquery-min",
 		"crafty": 'lib/crafty-min.js',
-		"dhtmlx": 'lib/dhtmlx/dhtmlx'
+		"dhtmlx": 'lib/dhtmlx/dhtmlx',
+		"bootstrap": 'lib/bootstrap.min'
 	},
 	shim: {
 		'backbone': {
@@ -15,6 +16,10 @@ require.config({
 			//Once loaded, use the global 'Backbone' as the
 			//module value.
 			exports: 'Backbone'
+		},
+		
+		'bootstrap': {
+			deps: ['jquery']
 		}
 	}
 });

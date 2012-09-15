@@ -9,7 +9,7 @@ define([
 	return function(app, dhxWins){
 		return {
 			open: Open(app, dhxWins),
-			save: Save(app, dhxWins)
+			save: Save
 		};
 	};
 });

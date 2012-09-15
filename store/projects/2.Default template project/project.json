@@ -1,0 +1,1 @@
+{"title":"Default template project","scenes":[{"path":"/","loadingScene":true,"entities":[{"path":"/","components":[],"id":"loader"}],"id":"loading"},{"path":"/","loadingScene":false,"entities":[{"path":"/","components":[],"id":"my_component"}],"id":"main"}],"entities":[],"components":[{"path":"/","deps":[],"id":"biiatch"}],"sprites":[],"assets":[]}

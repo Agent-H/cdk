@@ -25,7 +25,7 @@
 				ul.nav
 					- for (var i = 0; i < projects.length; ++i) {
 						li
-							a.welcome_pro_button(href="#", data-pro="projects/#{projects[i]}")
+							a.welcome_pro_button(href="#", data-pro="projects/#{projects[i].split('.')[0]}")
 								h4= projects[i].split('.')[1]
 					- }
 				- } else {
@@ -36,7 +36,7 @@
 				ul.nav
 					- for (var i = 0; i < templates.length; ++i) {
 						li
-							a.welcome_pro_button(href="#", data-pro="templates/#{templates[i]}")
+							a.welcome_pro_button(href="#", data-pro="templates/#{templates[i].split('.')[0]}")
 								h4= templates[i].split('.')[1]
 					- }
 			#welcome_examples(style="display: none;")
@@ -44,7 +44,7 @@
 				ul.nav
 					- for (var i = 0; i < examples.length; ++i) {
 						li
-							a.welcome_pro_button(href="#", data-pro="examples/#{examples[i]}")
+							a.welcome_pro_button(href="#", data-pro="examples/#{examples[i].split('.')[0]}")
 								h4= examples[i].split('.')[1]
 					- }
 	script(type="text/javascript")

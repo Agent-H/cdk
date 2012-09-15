@@ -16,7 +16,7 @@ define([
 	return Backbone.Model.extend({
 		defaults: {
 			title: 'untitled',
-			id: 'unsaved/0.untitled'
+			id: 'project/0'
 		},
 		
 		initialize: function(){

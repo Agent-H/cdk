@@ -41,7 +41,7 @@ define([
 							open: true,
 							item: _.map(elem, function(el){
 								return {
-									id: key+'/'+el,
+									id: key+'/'+el.split('.')[0],
 									text: el.split('.')[1]
 								};
 							})
@@ -70,6 +70,7 @@ define([
 					var sel = tree.getSelectedItemId();
 					
 					if(tree.getLevel(sel) == 2){
+					
 						app.models.project.set('id', sel);
 						app.models.project.fetch();
 						win.close();

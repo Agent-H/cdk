@@ -46,13 +46,18 @@ var exports = module.exports = {
 	
 	},
 	
-	save: function(data, cb){
-		
-	},
-	
 	getProject: function(req, res){
-		if(checkCategory(req, res))
-			res.sendfile(req.params.cat + '/' + req.params.id+'/project.json', {root: __dirname + '/../store/'});
+		if(checkCategory(req, res)){
+			fs.readdir(__dirname + '/../store/projects/', function(err, list){
+				for(var i = 0 ; i < list.length ; i++){
+					if(list[i].split('.')[0] == req.params.id){
+						res.sendfile(req.params.cat + '/' + list[i]+'/project.json', {root: __dirname + '/../store/'});
+						return;
+					}
+				}
+				
+			});
+		}
 	},
 	
 	getIndex: function(req, res){
@@ -83,25 +88,79 @@ var exports = module.exports = {
 			return;
 		}
 		
-		function doSave(){
+		function doSave(name){
 			var pro = req.body;
 			
 			delete pro.id;	//We don't want to save project's id
 			
-			fs.writeFile(__dirname + '/../store/projects/'+req.params.id+'/project.json', JSON.stringify(pro), function (err) {
-				if (err)
-					res.end('error');
-					
-				res.end('{}');
-			});
+			//Project has been renamed
+			if(pro.title != name){
+				fs.rename(__dirname + '/../store/projects/'+req.params.id+'.'+name, 
+						__dirname + '/../store/projects/'+req.params.id+'.'+pro.title,
+						
+				function(err){
+					if(err)
+						res.end("error, can't rename");
+					else
+						save();
+				});
+			}
+			else
+				save();
+			
+			function save(){
+				fs.writeFile(__dirname + '/../store/projects/'+req.params.id+'.'+pro.title+'/project.json', JSON.stringify(pro), function (err) {
+					if (err)
+						res.end('error');
+						
+					res.end('{"id":"projects/'+req.params.id+'"}');
+				});
+			}
 		}
 		
 		if(req.params.cat == 'projects'){
-			fs.exists(__dirname + '/../store/projects/'+req.params.id, function (exists) {
-				if(!exists)
-					fs.mkdir(__dirname + '/../store/projects/'+req.params.id, 0777, doSave);
-				else
-					doSave();
+			fs.readdir(__dirname + '/../store/projects/', function(err, list){
+				if(err)
+					res.end("error can't read dir");
+				else{
+					//The project is new
+					if(req.params.id == 0){
+						//The list is transformed into an array of used ids
+						var ids = new Array();
+						
+						
+						for(var i = 0 ; i < list.length ; i++){
+							ids.push(parseInt(list[i].split('.')[0]));
+						}
+						
+						//Looking for a free id
+						var i;
+						for(i = 1 ; ids.indexOf(i) != -1 ; i++){
+						}
+						
+						fs.mkdir(__dirname + '/../store/projects/'+i+'.'+req.body.title, function(err){
+							if(err){
+								res.end("error, can't make dir");
+							}
+							else{
+								req.params.id = i;
+								
+								doSave(req.body.title);
+							}
+						});
+					}
+					else{
+						//Searching complete name of the project
+						for(var i = 0 ; i < list.length ; i++){
+							if(list[i].split('.')[0] == req.params.id){
+								doSave(list[i].split('.')[1]);
+								return;
+							}
+						}
+						
+						res.end("error, can't find remote project");
+					}
+				}
 			});
 		}
 		else
