@@ -4,9 +4,9 @@ define([
 ], function(
 	Open
 ){
-	return function(dhxWins){
+	return function(app, dhxWins){
 		return {
-			open: Open(dhxWins)
+			open: Open(app, dhxWins)
 		};
 	};
 });

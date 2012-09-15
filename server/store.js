@@ -15,9 +15,11 @@ var exports = module.exports = {
 			return function(err, list){
 				collected[type] = list;
 				
-				if(err)
+				if(err){
 					error = err;
-					
+					collected[type] = true;
+				}
+				
 				if(collected.projects && collected.templates && collected.examples){
 					cb(error, collected);
 				}

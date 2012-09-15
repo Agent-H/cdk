@@ -19,6 +19,8 @@ app.get('/welcome_tab.html', function(req, res){
 				examples: data.examples
 			});
 		}
+		else
+			res.end('error');
 	});
 });
 

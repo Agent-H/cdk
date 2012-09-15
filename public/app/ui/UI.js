@@ -27,12 +27,6 @@ function(
 		
 		$(function(){
 			
-			/***	Dialogs	***/
-			UI.dhxWins = new dhtmlXWindows();
-			
-			UI.dialogs = Dialogs(UI.dhxWins);
-			
-			
 			/***	Layout setup	***/
 			var layout = UI.layout = {
 				main: new dhtmlXLayoutObject(document.body, '3W')
@@ -46,6 +40,12 @@ function(
 			
 			layout.settingsCell = layout.main.cells('c');
 			layout.settingsCell.setWidth('300');
+			
+			
+			/***	Dialogs	***/
+			UI.dhxWins = layout.main.dhxWins;
+			
+			UI.dialogs = Dialogs(app, UI.dhxWins);
 			
 			
 			/***	Views setup	***/
