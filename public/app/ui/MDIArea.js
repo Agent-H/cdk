@@ -1,8 +1,18 @@
 define([
 	'app/ui/views/Settings',
+	'app/ui/views/Entity',
+	'app/ui/views/Component',
+	'app/ui/views/Sprite',
+	'app/ui/views/Scene',
+	'app/ui/views/Asset',
 	'backbone'
 ], function(
-	SettingsView
+	SettingsView,
+	EntityView,
+	ComponentView,
+	SpriteView,
+	SceneView,
+	AssetView
 ){
 	return Backbone.View.extend({
 	
@@ -21,28 +31,61 @@ define([
 			//Keeps track of opened tabs
 			this.openedTabs = new Array("welcome_tab");
 			
+			this.views = {};
+			
 			tabbar.attachEvent("onTabClose", function(id){
+				_this.views[id].view.model.off('change:id', _this.views[id].changeHandler, _this);
+				delete _this.views[id];
 				delete _this.openedTabs[_this.openedTabs.indexOf(id)];
 				return true;
 			});
 			
+			this.Views = {
+				settings: SettingsView,
+				entity: EntityView,
+				component: ComponentView,
+				sprite: SpriteView,
+				scene: SceneView,
+				asset: AssetView
+			};
 		},
 		
-		select: function(type, model){
-			console.log("Select : "+type);
-			switch(type){
-				case 'settings':
-					if(this.openedTabs.indexOf('settings') == -1){
-						this.openTab('settings', 'Settings');
-						new SettingsView({
-							el: this.tabbar.cells('settings'),
-							model: this.model
-						});
-					}
-					else
-						this.tabbar.setTabActive('settings');
-				break;
+		makeTabId: function(type, model){
+			return (type == 'settings') ? 'settings' : type+model.cid;
+		},
+		
+		searchTab: function(id){
+			return (this.openedTabs.indexOf(id) != -1);
+		},
+		
+		selectTab: function(id){
+			if(this.searchTab(id)){
+				this.tabbar.setTabActive(id);
+				return true;
+			}
+			return false;
+		},
+		
+		createTab: function(type, model, id){
+			if(!id) id = this.makeTabId(type, model);
 			
+			var title = (type == 'settings') ? 'Settings' : model.id;
+			
+			this.openTab(id, title);
+			
+			this.views[id] = {
+				view : new this.Views[type]({
+					el: this.tabbar.cells(id),
+					model: model
+				}),
+				
+				changeHandler: function(model, label){
+					this.tabbar.setLabel(id, label);
+				}
+			};
+			
+			if(id != 'settings'){
+				model.on('change:id', this.views[id].changeHandler, this);
 			}
 		},
 		
@@ -50,6 +93,15 @@ define([
 			this.tabbar.addTab(id, title);
 			this.tabbar.setTabActive(id);
 			this.openedTabs.push(id);
+		},
+		
+		select: function(type, model){
+			console.log("Select : "+type);
+			
+			var tabId = this.makeTabId(type, model);
+			
+			if(!this.selectTab(tabId))
+				this.createTab(type, model, tabId);
 		},
 		
 		closeWelcomeTab: function(){

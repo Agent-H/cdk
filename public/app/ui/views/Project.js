@@ -412,7 +412,7 @@ define([
 				collec.add(newEl, {silent: true});
 			}
 			
-			newEl.set('id', this.findFreeElementName(collec, "new "+infos.type));
+			newEl.set('id', this.findFreeElementName(collec, "new_"+infos.type));
 			var newId = this.insertChildElement(dirid, newEl, infos.type);
 			
 			this.el.editItem(newId);

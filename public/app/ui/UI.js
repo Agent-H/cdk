@@ -29,7 +29,7 @@ function(
 			
 			/***	Layout setup	***/
 			var layout = UI.layout = {
-				main: new dhtmlXLayoutObject(document.body, '3W')
+				main: new dhtmlXLayoutObject(document.body, '2U')
 			};
 			
 			layout.projectCell = layout.main.cells('a');
@@ -37,9 +37,6 @@ function(
 			
 			layout.mainCell = layout.main.cells('b');
 			layout.mainCell.hideHeader();
-			
-			layout.settingsCell = layout.main.cells('c');
-			layout.settingsCell.setWidth('300');
 			
 			
 			/***	Dialogs	***/
