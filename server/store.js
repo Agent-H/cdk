@@ -48,14 +48,14 @@ var exports = module.exports = {
 	
 	getProject: function(req, res){
 		if(checkCategory(req, res)){
-			fs.readdir(__dirname + '/../store/projects/', function(err, list){
+			fs.readdir(__dirname + '/../store/'+req.params.cat+'/', function(err, list){
 				for(var i = 0 ; i < list.length ; i++){
 					if(list[i].split('.')[0] == req.params.id){
-						res.sendfile(req.params.cat + '/' + list[i]+'/project.json', {root: __dirname + '/../store/'});
+						res.sendfile('/../store/'+req.params.cat + '/' + list[i], {root: __dirname + '/../store/'});
 						return;
 					}
 				}
-				
+				res.send('error : project not found');
 			});
 		}
 	},
@@ -95,8 +95,8 @@ var exports = module.exports = {
 			
 			//Project has been renamed
 			if(pro.title != name){
-				fs.rename(__dirname + '/../store/projects/'+req.params.id+'.'+name, 
-						__dirname + '/../store/projects/'+req.params.id+'.'+pro.title,
+				fs.rename(__dirname + '/../store/projects/'+req.params.id+'.'+name+'.json', 
+						__dirname + '/../store/projects/'+req.params.id+'.'+pro.title+'.json',
 						
 				function(err){
 					if(err)
@@ -109,7 +109,7 @@ var exports = module.exports = {
 				save();
 			
 			function save(){
-				fs.writeFile(__dirname + '/../store/projects/'+req.params.id+'.'+pro.title+'/project.json', JSON.stringify(pro), function (err) {
+				fs.writeFile(__dirname + '/../store/projects/'+req.params.id+'.'+pro.title+'.json', JSON.stringify(pro), function (err) {
 					if (err)
 						res.end('error');
 						
@@ -137,17 +137,10 @@ var exports = module.exports = {
 						var i;
 						for(i = 1 ; ids.indexOf(i) != -1 ; i++){
 						}
+
+						req.params.id = i;
 						
-						fs.mkdir(__dirname + '/../store/projects/'+i+'.'+req.body.title, function(err){
-							if(err){
-								res.end("error, can't make dir");
-							}
-							else{
-								req.params.id = i;
-								
-								doSave(req.body.title);
-							}
-						});
+						doSave(req.body.title);
 					}
 					else{
 						//Searching complete name of the project
