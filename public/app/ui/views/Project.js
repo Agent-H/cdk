@@ -41,10 +41,11 @@ define([
 			
 			this.el.setIconsPath('lib/dhtmlx/imgs/');
 			this.el.enableItemEditor(true);
+			this.el.setEditStartAction(false, false);
 			this.el.enableDragAndDrop(true, false);
 			
 			
-			this.el.attachEvent("onClick", function(id){
+			this.el.attachEvent("onDblClick", function(id){
 				var infos = _this.getElementInfos(id);
 				
 				if(!infos.isRoot && infos.type != 'folder'){

@@ -77,12 +77,13 @@ define([
 				view : new this.Views[type]({
 					el: this.tabbar.cells(id),
 					model: model
-				}),
-				
+				}),				
 				changeHandler: function(model, label){
 					this.tabbar.setLabel(id, label);
 				}
 			};
+			
+			model.on('destroy', function(){	this.tabbar.removeTab(id);	}, this);
 			
 			if(id != 'settings'){
 				model.on('change:id', this.views[id].changeHandler, this);
