@@ -9,7 +9,8 @@ define([
 	return Backbone.Model.extend({
 		defaults: {
 			/* Path : helps user organise the project in the project tree. */
-			path: '/'
+			path: '/',
+			parent: false
 		},
 		
 		initialize: function(){

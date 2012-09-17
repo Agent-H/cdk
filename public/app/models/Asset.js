@@ -6,7 +6,9 @@ define([
 
 	return Element.extend({
 		defaults: _.extend({},Element.prototype.defaults, {
-
+			dataURI: '',
+			name: '',
+			type: ''
 		}),
 		
 		initialize: function(){

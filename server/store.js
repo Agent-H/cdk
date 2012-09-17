@@ -165,5 +165,20 @@ var exports = module.exports = {
 		}
 		else
 			res.end('error: User can only save projects');
+	},
+	
+	upload: function(req, res) {
+		console.log( req.files );
+		
+		if(req.params.id == 0){
+			res.send('<script type="text/javascript">error = "Asset can\'t be uploaded : save project first.";</script>');
+		}
+		else{
+			res.send('<script type="text/javascript">file = { \
+				 name: "'+req.files.data.name+'"\
+				,type: "'+req.files.data.type+'"\
+			}</script>');
+		}
+		// use fs.rename to move the file and unlink after that
 	}
 };

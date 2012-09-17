@@ -30,6 +30,8 @@ app.get('/store/', store.getIndex);
 app.get('/store/:cat', store.getCategory);
 app.put('/store/:cat/:id', store.saveProject);
 
+app.post('/store/upload/:cat/:id', store.upload);
+
 app.listen(5000);
 
 console.log("Server listening on port 5000.");

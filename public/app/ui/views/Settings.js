@@ -1,5 +1,5 @@
 define([
-	'app/ui/templates/settingsForm.js',
+	'app/ui/templates/settingsForm',
 	'backbone'
 ], function(
 	Template
