@@ -14,8 +14,7 @@ $(function(){
 	})();
 	
 	function openProject(pro){
-		app.models.project.set('id', pro);
-		app.models.project.fetch();
+		app.models.project.open(pro);
 		app.ui.MDIArea.closeWelcomeTab();
 	}
 	

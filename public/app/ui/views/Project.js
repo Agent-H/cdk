@@ -136,6 +136,10 @@ define([
 			
 			this.clipboard = {};
 			
+			
+			//Project events
+			this.model.on('closed', this.render, this);
+			
 			this.render();
 		},
 		

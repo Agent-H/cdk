@@ -70,9 +70,7 @@ define([
 					var sel = tree.getSelectedItemId();
 					
 					if(tree.getLevel(sel) == 2){
-					
-						app.models.project.set('id', sel);
-						app.models.project.fetch();
+						app.models.project.open(sel);
 						win.close();
 					}
 				}

@@ -17,11 +17,11 @@ define(['backbone'], function(){
 					case 'save':
 						app.save(project);
 						break;
-					case 'load':
-						
-						break;
 					case 'open':
 						app.open();
+						break;
+					case 'new':
+						project.create();
 						break;
 				}
 			});

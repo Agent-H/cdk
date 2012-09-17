@@ -48,6 +48,10 @@ define([
 				scene: SceneView,
 				asset: AssetView
 			};
+			
+			this.model.on('closed', function(){
+				this.tabbar.clearAll();
+			}, this);
 		},
 		
 		makeTabId: function(type, model){

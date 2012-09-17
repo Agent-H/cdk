@@ -20,8 +20,6 @@ define([
 		},
 		
 		initialize: function(){
-			console.log("project model initializing");
-			
 			this.url = "/store/";
 			
 			this.set("scenes", new Scenes(this.get('scenes')));
@@ -29,6 +27,34 @@ define([
 			this.set("components", new Components(this.get('components')));
 			this.set("sprites", new Sprites(this.get('sprites')));
 			this.set("assets", new Assets(this.get('assets')));
+		},
+		
+		open: function(id){
+			var _this = this;
+			
+			this.close();
+			
+			this.set('id', id);
+			this.fetch({
+				success: function(){
+					_this.trigger('opened');
+				}
+			});
+		},
+		
+		close: function(){			
+			this.get("scenes").reset();
+			this.get("entities").reset();
+			this.get("components").reset();
+			this.get("sprites").reset();
+			this.get("assets").reset();
+			
+			this.trigger('closed');
+		},
+		
+		create: function(){
+			this.close();
+			//TODO : create remote project
 		},
 		
 		//Proxying Backbone.sync function
