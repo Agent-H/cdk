@@ -35,6 +35,7 @@ define([
 			
 			tabbar.attachEvent("onTabClose", function(id){
 				_this.views[id].view.model.off('change:id', _this.views[id].changeHandler, _this);
+				_this.views[id].view.trigger('onClose');
 				delete _this.views[id];
 				delete _this.openedTabs[_this.openedTabs.indexOf(id)];
 				return true;
@@ -80,7 +81,8 @@ define([
 			this.views[id] = {
 				view : new this.Views[type]({
 					el: this.tabbar.cells(id),
-					model: model
+					model: model,
+					project: this.model
 				}),				
 				changeHandler: function(model, label){
 					this.tabbar.setLabel(id, label);

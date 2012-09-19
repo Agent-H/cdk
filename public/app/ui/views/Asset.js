@@ -17,6 +17,9 @@ define([
 			this.settingsCell.setWidth('300');
 			
 			this.model.on('change', this.render, this);
+			this.on('onClose', function(){
+				this.model.off('change', this.render, this);
+			}, this);
 			
 			this.render();
 		},
@@ -26,10 +29,10 @@ define([
 			if(!data){
 				this.previewCell.attachObject($('<div class="alert">No ressource loaded.</div>').get()[0]);
 			}
-			else if(data.substr(0, 10) == 'data:image'){
+			else if(this.model.isImage()){
 				this.previewCell.attachObject($('<div style="width: 100%; height: 100%; overflow: auto;"><img src="'+data+'" /></div>').get()[0]);
 			}
-			else if(data.substr(0, 10) == 'data:audio'){
+			else if(this.model.isAudio()){
 				//TODO
 			}
 			else{

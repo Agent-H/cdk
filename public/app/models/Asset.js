@@ -12,6 +12,18 @@ define([
 		}),
 		
 		initialize: function(){
+		},
+		
+		isImage: function(){
+			return (this.get('dataURI').substr(0, 10) == 'data:image');
+		},
+		
+		isAudio: function(){
+			return (this.get('dataURI').substr(0, 10) == 'data:audio');
+		},
+		
+		isValid: function(){
+			return (this.isImage || this.isValid);
 		}
 	});
 	
