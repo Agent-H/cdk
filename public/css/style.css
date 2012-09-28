@@ -1,0 +1,59 @@
+.propertyForm {
+	height: 100%;
+	margin: 0 10px;
+	position: relative;
+}
+
+.spriteImageGroup {
+	height: 70px;
+}
+
+.spritesList {
+	position: absolute;
+	top: 105px;
+	bottom: 0;
+	width: 100%;
+	overflow: auto;
+}
+
+.spriteAddButton {
+	float: right;
+	padding-top: 10px;
+}
+
+.spriteLabel .container {
+	padding-top: 10px;
+}
+
+.spriteLabel {
+	background-color: #EDEDF0;
+	padding: 5px;
+	border-radius: 5px;
+	margin: 10px 5px;
+}
+
+.spriteLabelAction {
+	display: block;
+}
+
+.spriteLabel.selected, .spriteLabel.selected:hover {
+	background-color: #AAD;
+}
+
+.spriteLabel:hover {
+	background-color: #D0D0DA;
+}
+
+.spriteName {
+	margin: 2px !important;
+}
+
+.coordsInputs {
+	margin-top: 10px;
+	display: none;
+}
+
+.spriteCoordsInput {
+	width: 20px;
+	margin-right: 7px;
+}

@@ -6,7 +6,8 @@ require.config({
 		"jquery": "lib/jquery-min",
 		"crafty": 'lib/crafty-min.js',
 		"dhtmlx": 'lib/dhtmlx/dhtmlx',
-		"bootstrap": 'lib/bootstrap.min'
+		"bootstrap": 'lib/bootstrap.min',
+		'kinetic': 'lib/kinetic-min'
 	},
 	shim: {
 		'backbone': {
