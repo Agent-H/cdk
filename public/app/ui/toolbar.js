@@ -23,6 +23,12 @@ define(['backbone'], function(){
 					case 'new':
 						project.create();
 						break;
+					case 'build':
+						app.models.compiler.build(project, {root: ''});
+						break;
+					case 'test':
+						app.ui.testing.test();
+						break;
 				}
 			});
 			

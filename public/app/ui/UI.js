@@ -3,6 +3,7 @@ define([
 	"app/ui/Toolbar",
 	"app/ui/MDIArea",
 	"app/ui/Dialogs",
+	"app/ui/Testing",
 	"jquery",
 	"dhtmlx"
 ],
@@ -12,7 +13,8 @@ function(
 	ProjectBrowser,
 	Toolbar,
 	MDIArea,
-	Dialogs
+	Dialogs,
+	Testing
 	
 	){
 	
@@ -62,6 +64,9 @@ function(
 				model: app.models.project
 			});
 			
+			UI.testing = new Testing({
+				el: window.document.getElementById('testContainer')
+			});
 			
 			/***	UI events	***/
 			

@@ -1,12 +1,13 @@
 require([
 	"app/ui/UI",
 	"app/models/Project",
+	"app/models/Compiler",
 	"backbone"
 ], 
 function(
 	UI,
 	Project,
-	ProjectCollec
+	Compiler
 ) {
 	//Short-circuit default backbone.sync's behaviour
 	Backbone.sync = function(){};
@@ -14,7 +15,8 @@ function(
 	var app = window.app = {
 		models: {
 			//Loading default project template
-			project: new Project()
+			project: new Project(),
+			compiler: new Compiler()
 		}
 	};
 	

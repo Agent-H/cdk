@@ -63,7 +63,7 @@ define([
 			this.settingsCell.attachObject(this.form.get()[0]);
 		},
 		
-		addSprite: function(sprite, noPush){
+		addSprite: function(sprite){
 			var _this = this;
 			
 			
@@ -90,9 +90,6 @@ define([
 				sprite.trigger('select');
 			}
 			
-			if(noPush != true)
-				this.model.get('sprites').push(sprite);
-
 			label
 			.click(select)
 			.mouseenter(function(){
@@ -116,6 +113,7 @@ define([
 			label.find('[data-coord="y"]').change(function(){sprite.set('y', $(this).val());});
 			label.find('[data-coord="w"]').change(function(){sprite.set('w', $(this).val());});
 			label.find('[data-coord="h"]').change(function(){sprite.set('h', $(this).val());});
+			label.find('.spriteName').change(function(){sprite.set('name', $(this).val());});
 			
 			this.form.find('.spritesList').append(label);
 			
@@ -358,7 +356,7 @@ define([
 			
 			var sprites = this.model.get('sprites');
 			for(var i = 0 ; i < sprites.length ; i++){
-				this.addSprite(sprites[i], true);
+				this.addSprite(sprites[i]);
 			}
 			
 		},

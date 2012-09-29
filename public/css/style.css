@@ -57,3 +57,23 @@
 	width: 20px;
 	margin-right: 7px;
 }
+
+#testContainer {
+	background-color: #FFFFFF;
+    display: block;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+#testHeader {
+	border-bottom: 1px black solid;
+}
+
+#testingFrame {
+	width: 100%;
+	height: 100%;
+}
